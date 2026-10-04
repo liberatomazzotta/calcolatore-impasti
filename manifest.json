@@ -1,0 +1,25 @@
+{
+  "name": "Calcolatore Impasti",
+  "short_name": "Impasti",
+  "description": "Calcolatore di ricette per impasti di pizza e focaccia, con calcolo a ritroso dei tempi.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f3ec",
+  "theme_color": "#7a1f2b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

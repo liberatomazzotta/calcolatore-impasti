@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calcolatore Impasti</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7a1f2b">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Impasti">
+<style>
+  :root {
+    --bg: #f7f3ec;
+    --card: #ffffff;
+    --accent: #7a1f2b;
+    --accent-soft: #f0dfe0;
+    --text: #2a2320;
+    --muted: #8a7f76;
+    --border: #e7ddd0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 14px 60px;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; }
+  h1 {
+    color: var(--accent);
+    font-size: 1.5rem;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .tab-btn {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .category-block { margin-bottom: 22px; }
+  .category-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 8px 2px;
+    font-style: normal;
+  }
+
+  .recipe-desc {
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .recipe-desc-title {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .input-card label { font-weight: bold; font-size: 0.95rem; }
+  .input-card input {
+    font-family: inherit;
+    font-size: 1.05rem;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 120px;
+  }
+  .input-card span.unit { color: var(--muted); font-size: 0.9rem; }
+  .hydration-badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 0.82rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .reset-btn {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 7px 12px;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: var(--accent-soft); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 480px) {
+    .cols { grid-template-columns: 1fr; }
+  }
+  .group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .group.full { grid-column: 1 / -1; }
+  .group h2 {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: italic;
+    margin: 0 0 8px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 6px;
+  }
+  .group-hydration {
+    font-style: normal;
+    font-weight: normal;
+    color: var(--muted);
+    font-size: 0.8em;
+  }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.95rem;
+  }
+  li:last-child { border-bottom: none; }
+  li .val { font-weight: bold; color: var(--accent); }
+  li .pct { font-weight: normal; color: var(--muted); font-size: 0.85em; }
+  li .val.modified { color: #b5651d; }
+  li .val.modified .pct { color: #b5651d; }
+  .edit-pct-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-left: 4px;
+    padding: 0 2px;
+  }
+  .edit-pct-btn:hover { color: var(--accent); }
+  .val.editing { display: inline-flex; align-items: center; gap: 4px; font-weight: normal; }
+  .pct-input {
+    font-family: inherit;
+    font-size: 0.9rem;
+    width: 60px;
+    padding: 2px 4px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+  }
+  .pct-save {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .modified-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #fbe9d5;
+    border: 1px solid #d9a35c;
+    color: #7a4a12;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+  .reset-pct-btn {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border: 1px solid #7a4a12;
+    border-radius: 6px;
+    background: transparent;
+    color: #7a4a12;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .reset-pct-btn:hover { background: #f0d5ae; }
+
+  .total-row {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .note {
+    margin-top: 24px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .recipe-panel { display: none; }
+  .recipe-panel.active { display: block; }
+
+  .backward-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+  .backward-box h2 {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: italic;
+    margin: 0 0 12px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 6px;
+  }
+  .backward-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .backward-input-row label { font-weight: bold; font-size: 0.9rem; }
+  .backward-input-row input[type="datetime-local"] {
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .backward-hint {
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-style: italic;
+    margin: 0;
+  }
+  .phase-item {
+    border-bottom: 1px dashed var(--border);
+    padding: 8px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .phase-item.final { border-bottom: none; }
+  .phase-item.chiusura-marker {
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 4px 0 8px;
+    border-bottom: none;
+  }
+  .phase-item.chiusura-marker .phase-label { color: var(--accent); }
+  .phase-times {
+    font-size: 0.82rem;
+    color: var(--muted);
+    min-width: 190px;
+  }
+  .phase-arrow { color: var(--accent); }
+  .phase-label {
+    font-weight: bold;
+    font-size: 0.92rem;
+    flex: 1;
+  }
+  .phase-note {
+    font-weight: normal;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+  .phase-hours-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .phase-hours-edit .hours-input {
+    font-family: inherit;
+    font-size: 0.88rem;
+    width: 52px;
+    padding: 3px 5px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .timeline-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+  .timeline-box h2 {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: italic;
+    margin: 0 0 12px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 6px;
+  }
+  .timeline {
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px solid var(--accent-soft);
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 16px;
+  }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-dot {
+    position: absolute;
+    left: -25px;
+    top: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--card);
+  }
+  .timeline-daytime {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .timeline-label {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .timeline-duration {
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .steps {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+  .steps h2 {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: italic;
+    margin: 0 0 10px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 6px;
+  }
+  .steps ol {
+    margin: 0;
+    padding-left: 20px;
+  }
+  .steps li {
+    display: list-item;
+    border-bottom: none;
+    padding: 4px 0;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Calcolatore Impasti — ricette dai miei libri</h1>
+  <div class="sub">Scegli il procedimento, inserisci il peso totale di impasto desiderato: le dosi si ricalcolano mantenendo esattamente le proporzioni del libro.</div>
+
+  <div id="tabsWrap"></div>
+  <div id="panels"></div>
+
+  <div class="note" id="globalNote"></div>
+</div>
+
+<script>
+/*
+  Ogni ricetta replica esattamente i pesi riportati nelle foto del libro di Bonci,
+  scalati proporzionalmente sul totale dell'impasto richiesto (modalità "sumScale").
+  Aggiungere una nuova ricetta: copiare la struttura di un gruppo esistente in "recipes".
+*/
+
+const recipes = {
+
+  bonciBigaPoolish: {
+    label: "Biga + Poolish (Bonci)",
+    category: "indiretti",
+    mode: "sumScale", // scala sul totale dei pesi originali
+    desc: "Doppio prefermento (biga rigida + poolish liquido) uniti in un impasto finale. Impasto particolarmente adatto per le pizze cotte al padellino, anziché in teglia in forno. Lavorazione consigliata con impastatrice. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Per la biga": { "Farina tipo 1 forte": 600, "Acqua": 270, "Lievito di birra": 6 },
+      "Per il poolish": { "Farina tipo 1 forte": 400, "Acqua": 400, "Lievito di birra": 0.5 },
+      "Per l'impasto finale": { "Lievito di birra": 5, "Malto (o zucchero x5)": 4, "Olio EVO": 40, "Sale": 25 }
+    },
+    steps: [
+      "Iniziate dalla biga. Usate acqua fredda e tenete la farina in frigorifero prima di usarla.",
+      "Sciogliete il lievito nell'acqua, versate il composto nella farina e create l'impasto.",
+      "Tenete la biga a temperatura ambiente per 2 ore, poi mettetela in frigorifero per 24 ore.",
+      "Nel frattempo passate al poolish: qui gli ingredienti devono essere a temperatura ambiente. Sciogliete il lievito nell'acqua, aggiungete la farina poco alla volta e con un cucchiaio create una pastella.",
+      "Mettete il poolish in frigorifero per 24 ore, finché non vedrete che cede al centro creando una spaccatura.",
+      "Dopo 24 ore, cominciate a unire il poolish alla biga.",
+      "Aggiungete il lievito di birra, poi il malto o lo zucchero, l'olio e il sale.",
+      "Lasciate riposare l'impasto ancora per un'ora e mezza circa."
+    ]
+  },
+
+  bonciImpastoConBiga: {
+    label: "Impasto con biga (Bonci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Preimpasto duro (poco idratato, tende a sbriciolarsi), da lavorare preferibilmente con impastatrice. Per la biga usare farine forti, con W intorno a 300. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Per la biga": { "Farina forte": 700, "Acqua fredda": 315, "Lievito di birra fresco": 7 },
+      "Per l'impasto successivo": { "Farina debole da biscotto": 300, "Acqua": 285, "Lievito di birra fresco": 5, "Malto (o zucchero x5)": 4, "Olio EVO": 40, "Sale": 25 }
+    },
+    steps: [
+      "Iniziate il giorno prima con la biga. È importante che sia fredda: usate acqua fredda e tenete la farina in frigorifero prima di usarla.",
+      "Sciogliete il lievito nell'acqua. Versate il composto nella farina e create un impasto non chiuso: la consistenza risulterà non elastica ma polverosa.",
+      "Tenete la biga a temperatura ambiente per 2 ore, poi mettetela in frigorifero per 24 ore.",
+      "Il giorno dopo procedete con il resto dell'impasto. Versate sulla biga metà dell'acqua e mescolate fino a creare una pastella.",
+      "Aggiungete la farina debole poco alla volta, il lievito, il malto (o lo zucchero) e il sale, bagnando il tutto con altri 100 g di acqua, poi l'olio e chiudete con la restante acqua.",
+      "Tenete l'impasto a temperatura ambiente per circa 2 ore, fate le pezzature e aspettate che raddoppino di volume: a questo punto saranno pronte da usare.",
+      "Nota: durante la lievitazione della biga i lieviti consumano gli zuccheri disponibili. Per questo nella fase successiva si aggiunge il malto (idealmente diastasico) o, in mancanza, lo zucchero, così da fornire nuovo nutrimento ai lieviti freschi."
+    ]
+  },
+
+  bonciImpastoConPoolish: {
+    label: "Impasto con poolish (Bonci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Prefermento liquido (idratazione 100%, pari quantità di acqua e farina), da lavorare con il cucchiaio. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Per il poolish": { "Acqua": 700, "Farina tipo 1 forte": 700, "Lievito di birra": 1 },
+      "Per l'impasto successivo": { "Farina tipo 1 debole (da biscotto)": 300, "Lievito di birra fresco": 7, "Malto": 4, "Olio EVO": 40, "Sale": 25, "Acqua": 100 }
+    },
+    steps: [
+      "Per il poolish usate ingredienti a temperatura ambiente. Il giorno prima sciogliete il lievito nell'acqua, aggiungete la farina poco alla volta e con un cucchiaio create una pastella.",
+      "Lasciate il poolish per 24 ore in frigorifero. Sarà pronto quando cede al centro creando una spaccatura.",
+      "Aggiungete al poolish gli ingredienti dell'impasto successivo: mescolate la farina al poolish fino a ottenere un impasto omogeneo, aggiungete il lievito di birra, mescolate e poi aggiungete anche il malto e il sale.",
+      "A questo punto unite l'olio e poco alla volta l'acqua, fino a ottenere un impasto omogeneo.",
+      "Lasciate riposare l'impasto ancora per un'ora e mezza circa, o comunque finché non sarà cresciuto di circa tre quarti."
+    ]
+  },
+
+  bonciImpastoCereali: {
+    label: "Impasto con cereali (Bonci)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto (senza prefermento) con farine multicereali — grano tenero, semola di grano duro, farro e segale — per un sapore più ricco. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Farina tipo 1 forte": 500, "Semola rimacinata di grano duro": 250, "Farina di farro": 200, "Farina di segale": 50,
+        "Acqua": 800, "Lievito di birra fresco (o secco 3g)": 5, "Sale": 25, "Olio EVO": 30
+      }
+    },
+    steps: [
+      "Mescolate le farine con acqua e lievito, impastate e aggiungete gli altri ingredienti.",
+      "Una volta eseguite le piegature di rinforzo, mettete subito l'impasto in frigorifero e aspettate 24 ore.",
+      "Fate le pezzature sull'impasto ancora freddo e lasciate lievitare a temperatura ambiente, finché i panetti non saranno raddoppiati di volume, poi stendete in teglia."
+    ]
+  },
+
+  bonciImpastoDiretto24Ore: {
+    label: "Impasto diretto a 24 ore (Bonci)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto (senza prefermento) con lunga maturazione in frigorifero, per una masticazione più consistente rispetto a un diretto a 12 ore. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Farina tipo 1 forte": 800, "Semola rimacinata di grano duro": 200, "Acqua": 800,
+        "Lievito di birra fresco (o secco 3g)": 5, "Sale": 25, "Olio EVO": 30
+      }
+    },
+    steps: [
+      "Impastate come al solito ed eseguite le piegature di rinforzo, poi mettete subito l'impasto in frigorifero e lasciatelo lievitare per 24 ore.",
+      "Quando è ancora freddo, fate le pezzature e lasciatele a temperatura ambiente finché non saranno raddoppiate di volume.",
+      "A questo punto l'impasto sarà pronto da stendere."
+    ]
+  },
+
+  bonciImpastoTuttaSemola: {
+    label: "Impasto tutta semola (Bonci)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto realizzato interamente con semola rimacinata di grano duro, dal colore tendente al giallo e da profumi e consistenze particolari. La semola assorbe mediamente il 5-6% in più di liquidi rispetto alla farina di grano. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Semola rimacinata di grano duro": 1000, "Acqua": 900, "Sale": 25, "Olio EVO": 60, "Lievito di birra fresco (o secco 3g)": 5
+      }
+    },
+    steps: [
+      "Impastate come al solito, eseguite le piegature di rinforzo e mettete l'impasto in frigorifero per 24 ore.",
+      "Fate le pezzature quando l'impasto è ancora freddo e lasciatele lievitare a temperatura ambiente finché non saranno raddoppiate di volume.",
+      "Infine, stendete in teglia."
+    ]
+  },
+
+  casucciBigaTradizionale25: {
+    label: "Pizza tradizionale con biga al 25% (Casucci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Impasto tradizionale con biga al 25% sulla farina totale, dal libro \"La pizza è un'arte\" di Casucci. Biga con farina W350/380, idratata al 44% con 1% di lievito, maturata 18-20 ore. Cottura in forno a legna, gas o elettrico a 340-370°C, per un massimo di 2 minuti. Proporzioni originali basate su un esempio di impasto da 10 kg di farina.",
+    groups: {
+      "Biga (25% della farina totale)": { "Farina 0 W350/380": 2500, "Acqua": 1100, "Lievito": 25 },
+      "Rinfresco": { "Farina tipo 0 W300/320": 7500, "Acqua": 4500, "Sale": 250, "Olio EVO": 250, "Malto": 30, "Lievito (solo periodo freddo)": 5 }
+    },
+    steps: [
+      "Utilizzate la biga dopo 18-20 ore di fermentazione.",
+      "Iniziate impastando gli ingredienti del rinfresco: farina, malto, acqua, lievito (se previsto), olio, sale.",
+      "Dopo circa due minuti aggiungete la biga spezzandola in parti più piccole e terminate l'impasto.",
+      "Puntata di 15 minuti circa, poi staglio formando palline da 200 grammi.",
+      "Appretto di 2-4 ore a temperatura ambiente, poi in cella per 18 ore minimo.",
+      "Prima dell'utilizzo fate terminare la lievitazione per 3-4 ore: l'impasto deve essere comunque a temperatura ambiente prima di essere lavorato.",
+      "Cottura: in forno a legna, gas o elettrico, a temperatura di 340-370°C, per un tempo massimo di 2 minuti."
+    ]
+  },
+
+  casucciBigaTradizionale50Autolisi: {
+    label: "Pizza tradizionale con biga al 50% e autolisi (Casucci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Tecnica avanzata: biga al 50% sulla farina totale, unita a un impasto autolitico del rinfresco (farina + gran parte dell'acqua + metà del sale, lasciato riposare senza pieghe nella stessa cella della biga). Metodo applicabile praticamente a tutte le farine, adatto sia a pizza che a focaccia. Proporzioni originali basate su un esempio di impasto da 10 kg di farina, idratazione totale 56%.",
+    groups: {
+      "Biga (50% della farina totale)": { "Farina 0 W350/380": 5000, "Acqua": 2200, "Lievito": 50 },
+      "Rinfresco (impasto autolitico)": { "Farina 0": 5000, "Acqua": 3400, "Sale": 250, "Malto": 60, "Olio EVO": 300, "Lievito": 10 }
+    },
+    steps: [
+      "Preparate la biga e lasciatela fermentare 18-20 ore a 18°C.",
+      "Contemporaneamente preparate l'impasto autolitico del rinfresco: tutta la farina del rinfresco, circa il 90% dell'acqua del rinfresco (in questo esempio 3.060 g) e solo il 50% del sale previsto (125 g).",
+      "Mettete l'impasto autolitico, senza pieghe, in un contenitore coperto e appena unto d'olio, nella stessa cella dove riposa la biga, a 18-20°C.",
+      "A biga fermentata e ad autolisi terminata, iniziate il rinfresco inserendo la massa autolitica, il malto e l'acqua rimasta con il lievito sciolto al suo interno.",
+      "Dopo circa due minuti aggiungete la biga spezzettandola in parti più piccole, e continuate a impastare aggiungendo prima l'olio e poi il sale restante.",
+      "Lasciate riposare l'impasto un minuto nell'impastatrice, poi dategli ancora due o tre giri a velocità uno: dovrà uscire a una temperatura di circa 23°C.",
+      "Nota dell'autore: il sale nella massa autolitica va limitato al 50% del totale (con tutto il sale l'autolisi non avviene correttamente); questo accorgimento vale quando la biga è al 50% dell'impasto, mentre con percentuali di biga più basse (fino al 15%) non è necessario considerarlo."
+    ]
+  },
+
+  casucciNapoliBiga40: {
+    label: "Impasto Napoli con biga al 40% (Casucci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Impasto per pizza napoletana con biga al 40% sulla farina totale, idratazione totale 63%. L'autore precisa che questa ricetta non segue la STG (Specialità Tradizionale Garantita) della pizza napoletana. Cottura in forno a legna o gas, ad alta temperatura, tipica della pizza napoletana. Proporzioni originali basate su un esempio di impasto da 10 kg di farina.",
+    groups: {
+      "Biga (40% della farina totale)": { "Farina 0 W350/380": 4000, "Acqua": 1760, "Lievito": 40 },
+      "Rinfresco": { "Farina tipo 0 W300/340": 6000, "Acqua": 4540, "Sale": 280, "Malto": 40, "Olio EVO": 150, "Lievito": 10 }
+    },
+    steps: [
+      "Utilizzate la biga dopo 18-20 ore di fermentazione.",
+      "Iniziate impastando gli ingredienti del rinfresco: farina, malto, acqua, lievito, olio, sale.",
+      "Dopo circa due minuti aggiungete la biga spezzandola in parti più piccole e terminate l'impasto.",
+      "Puntata di 15 minuti circa, poi staglio formando palline da 260-280 grammi.",
+      "Appretto massimo 1 ora a temperatura ambiente, poi mettete in cella frigo tarata a 3°C per 12-18 ore.",
+      "Prima dell'utilizzo fate proseguire la lievitazione: l'impasto deve essere comunque a temperatura ambiente prima di essere lavorato.",
+      "Cottura: in forno a legna o gas, a 400°C minimo in platea e 450°C in cielo, per un tempo massimo di cottura di un minuto.",
+      "Nota dell'autore: nella pizza napoletana l'alta temperatura del forno è fondamentale — grazie ad essa si ottiene la tipica base morbida con la mozzarella che non fa a tempo a bruciarsi né a far evaporare troppa acqua, per una cottura rapida in circa un minuto."
+    ]
+  },
+
+  casucciNuvolaBiga70: {
+    label: "Impasto Nuvola - cottura a vapore, biga al 70% (Casucci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Impasto \"Nuvola\" con biga al 70% sulla farina totale, idratazione totale 75%. Cottura in due fasi in forno a vapore: prima a bassa temperatura fino a 70°C al cuore, poi seconda cottura senza vapore per la doratura. Prodotto leggero e consistente, base ideale per la pizza gourmet farcita a spicchio. Proporzioni originali basate su un esempio di impasto da 5 kg di farina.",
+    groups: {
+      "Biga (70% della farina totale)": { "Farina 0 W350/380": 3500, "Acqua": 1540, "Lievito": 35 },
+      "Rinfresco": { "Farina tipo 0 W320/350": 1500, "Acqua": 2210, "Sale": 150, "Olio EVO": 150, "Malto": 25 }
+    },
+    steps: [
+      "Utilizzate la biga dopo 18 ore di fermentazione.",
+      "Proseguite impastando gli ingredienti del rinfresco: farina, malto, acqua, olio, raggiungendo circa il 60% dell'acqua totale.",
+      "Dopo circa due minuti aggiungete la biga, spezzandola in parti più piccole, a filo.",
+      "Continuate ad aggiungere la rimanente acqua a filo fino a raggiungere circa il 65% di idratazione, poi passate alla velocità due dell'impastatrice.",
+      "A questo punto inserite il sale e proseguite fino a raggiungere il punto pasta.",
+      "Date le pieghe e ponete l'impasto in massa dentro un contenitore coperto, attendendo il raddoppio.",
+      "Procedete poi allo staglio dei panetti, che andranno posti in teglie oliate con bordo di circa 4 cm e diametro di 25-26 cm.",
+      "Per la giusta pezzatura usate il rapporto dose/area: l'area di una teglia da 25 cm di diametro è 490 cm²; moltiplicando per il coefficiente 0,66 si ottengono i grammi di impasto necessari (490 × 0,66 = 323 grammi).",
+      "Stendete l'impasto in teglia lasciando il bordo, schiacciandolo senza tirarlo, e lasciatelo lievitare fino a vederlo quasi triplicare: non deve sbollare e deve mantenere una buona tensione superficiale.",
+      "Cottura (1ª fase): forno multifunzione a convezione, 100% vapore, 125°C, per 15 minuti; l'impasto deve restare bianco e raggiungere 70°C al cuore.",
+      "Terminata la prima cottura, togliete dal padellino, fate raffreddare e tagliate in 4-6 spicchi.",
+      "Cottura (2ª fase): riunite gli spicchi su griglia nello stesso forno e cuocete a 240°C, senza vapore e senza ventola, fino a raggiungere un colore bruno dorato. Farcite e servite: è da considerare una base per la pizza gourmet."
+    ]
+  },
+
+  bonciFocacciaTradizionale: {
+    label: "Impasto per focaccia tradizionale (Bonci)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto a base di sola semola di grano duro rimacinata, con lievitazione breve (circa 4 ore + lievitazione in teglia). Adatto a focacce tipiche come la focaccia barese e il mustazzeddu, non a tutte le pizze in teglia. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Semola di grano duro rimacinata": 1000, "Acqua": 850, "Lievito di birra": 10, "Zucchero": 15, "Sale": 25, "Olio EVO": 50
+      }
+    },
+    steps: [
+      "In una ciotola sciogliete nell'acqua il lievito e lo zucchero, aggiungete la semola a pioggia e mescolate.",
+      "Unite il sale e continuate a impastare fino a quando la maglia non sarà ben salda.",
+      "Aggiungete l'olio poco alla volta e lasciate riposare per circa 4 ore.",
+      "Dopo la lievitazione fate le pezzature, mettete l'impasto in teglia con tanto olio e lasciatelo lievitare finché non raddoppia di volume.",
+      "Infornate a 230-240°C per 14-15 minuti.",
+      "Nota dell'autore: lo zucchero aggiunto negli impasti a lievitazione breve serve a far lavorare meglio il lievito e a dare alla focaccia (o pizza) una colorazione più invitante."
+    ]
+  },
+
+  bonciImpastoDirettissimo: {
+    label: "Impasto direttissimo (Bonci)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "L'impasto più veloce di tutti: richiede appena un'ora di lievitazione, perfetto per chi ha poco tempo o un ospite inatteso. La tradizione vuole lo strutto come grasso principale (fino agli anni Ottanta si usava il grasso di recupero, in particolare di maiale), ma si può realizzare anche con olio d'oliva. Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Farina tipo 0 medio-forte": 1000, "Acqua": 750, "Lievito di birra fresco": 15, "Olio EVO": 60, "Sale": 25, "Zucchero": 18
+      }
+    },
+    steps: [
+      "In una ciotola versate 600 grammi d'acqua e il lievito. Mescolate per far sciogliere il lievito, poi aggiungete lo zucchero e mescolate ancora.",
+      "Quando tutto sarà ben sciolto, aggiungete la farina a pioggia poco alla volta. Cominciate a impastare, poi via via unite il sale, la restante acqua e per ultimo l'olio (o lo strutto).",
+      "Tenete l'impasto a riposo per un'ora a 27-30°C.",
+      "Infine, fate le pezzature in base alle dimensioni della vostra teglia e aspettate che raddoppino di volume.",
+      "Stendete l'impasto in teglia e cuocete.",
+      "In alternativa ai 60 g di olio EVO, si possono usare 100 g di strutto.",
+      "Nota dell'autore su strutto o olio EVO: lo strutto è l'ingrediente tradizionale della pizza in teglia italiana, conferisce all'impasto un sapore più deciso e una maggiore croccantezza, e la pizza aumenterà anche di volume. L'olio è più leggero e potrebbe essere più adatto se scegliete per il top un condimento molto ricco."
+    ]
+  },
+
+  pizzaDaPasseggioDanyBina: {
+    label: "Pizza da passeggio (Dany Bina)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto con autolisi iniziale (farina, acqua e latte), farcita con pomodoro condito e mozzarella aggiunta a metà cottura. Ricetta condivisa da Dany Bina nel gruppo Facebook \"La Confraternita della Pizza\" (18 maggio 2021). Nota: il miele era indicato come \"1 cucchiaio\" negli appunti originali — qui convertito in circa 21 g, valore approssimativo che puoi regolare.",
+    groups: {
+      "Ingredienti": {
+        "Farina (W max 270)": 700, "Acqua": 400, "Latte": 50, "Lievito di birra": 7,
+        "Miele (1 cucchiaio ≈ 21 g)": 21, "Sale": 16, "Olio EVO": 45
+      }
+    },
+    steps: [
+      "Partiamo con una bella autolisi di 1 ora con tutta la farina, tutta l'acqua e il latte.",
+      "Passata l'ora mettiamo in macchina aggiungendo anche il lievito di birra e, partendo lentamente, lasciamo legare l'impasto.",
+      "Aggiungiamo il miele e portiamo a quasi incordatura (non esagerate), poi aggiungiamo il sale e l'olio.",
+      "Il tempo che l'olio sia assorbito, spegniamo e mettiamo sul banco facendo subito una piega a 3 e una leggera pirlatura.",
+      "Lasciamo riposare l'impasto per 30 minuti e facciamo un'altra piega a 3 più pirlatura.",
+      "Mettiamo in un contenitore e aspettiamo 1 ora a temperatura ambiente, poi mettiamo in frigorifero coperto.",
+      "5 ore prima di cuocere, dividiamo la massa in 2 parti.",
+      "Dopo 1 ora cerchiamo di stendere la pasta nella teglia 30x40, senza forzare troppo; lasciamo riposare mezz'ora nel forno, poi finiamo di stendere.",
+      "Lasciamo riposare 1 ora, condiamo con abbondante pomodoro (già condito con sale, olio e un po' di origano) e lasciamo finire la lievitazione.",
+      "Cuociamo in forno a 250°C sopra e sotto per 8 minuti, togliamo, mettiamo abbondante mozzarella e olio, e reinforniamo per finire la cottura.",
+      "Si può mangiare addoppiata (a due strati) oppure solo a quadrotti."
+    ]
+  },
+
+  petraTondaPiatto5072: {
+    label: "Pizza tonda al piatto Petra 5072 (Petra)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto a metodo diretto con lievito di birra, lievitazione lunga (dalle 40 alle 52 ore circa) gestita a controllo refrigerato, dalla scheda tecnica Petra® - Università della Pizza. Farina Petra® 5072. Temperatura finale dell'impasto ideale: 24-25°C. Resa originale: 7 palline da 220 g circa (peso a crudo), per un totale di 1702 g di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Farina Petra 5072": 1000, "Lievito di birra fresco": 2, "Acqua": 650, "Sale": 20, "Olio EVO": 30
+      }
+    },
+    steps: [
+      "Disporre tutta la farina, 600 g di acqua e il lievito di birra nell'impastatrice e impastare sino a far formare la maglia glutinica.",
+      "Aggiungere il sale, la restante acqua e infine l'olio, continuando a impastare sino ad ottenere una consistenza liscia e omogenea.",
+      "Terminato l'impasto, controllarne la temperatura, fondamentale nel determinare l'innesco e l'andamento della lievitazione: per questa tipologia di impasto la temperatura finale ideale è di 24-25°C.",
+      "Gestione impasto: una volta terminato, l'impasto può essere gestito con due sistemi diversi, entrambi a lunga lievitazione.",
+      "Sistema 1: formare subito le palline, lasciarle riposare 1 ora a temperatura ambiente di 24°C, poi porle in frigorifero a 4°C per 48 ore. Toglierle dal frigo 4-5 ore prima dell'utilizzo, lasciandole a temperatura di 22-24°C, in modo da permettere che raggiungano un livello ottimale di lievitazione prima della cottura.",
+      "Sistema 2: lasciare l'impasto in massa e trasferirlo in un mastello coperto (in modo che non prenda aria), farlo sostare 30 minuti-1 ora a 24°C, poi mettere il mastello in frigo per 36-48 ore. Trascorse le ore, procedere alla formatura delle palline e lasciarle lievitare altre 4-5 ore a 24°C prima della cottura.",
+      "Cottura: in forno a legna o elettrico, temperatura consigliata 300-320°C, da regolare in base alle caratteristiche del proprio forno."
+    ],
+    phases: [
+      { label: "Impasto", hours: 0.5, note: "prima dello staglio" },
+      { label: "Staglio e puntata palline", hours: 1, note: "formatura panetti e riposo a temperatura ambiente" },
+      { label: "Frigo", hours: 48, note: "4°C" },
+      { label: "Appretto", hours: 4, note: "uscita dal frigo prima della cottura" }
+    ],
+    cotturaNote: "forno a legna o elettrico, 300-320°C"
+  },
+
+  mannaDirettoLungo: {
+    label: "Impasto diretto 75% idratazione (Manna)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto a metodo diretto con lievito di birra e lunga maturazione in frigo, ricetta condivisa da Ferdinando Manna. Farina W290/340, idratazione 75%. Dosi riferite a 1 kg di farina.",
+    groups: {
+      "Ingredienti": {
+        "Farina W290/340": 1000, "Acqua": 750, "Sale": 27, "Lievito di birra": 1.7
+      }
+    },
+    steps: [
+      "Impastare tutti gli ingredienti sino ad ottenere un impasto liscio e omogeneo.",
+      "Far riposare in puntata per 2 ore a temperatura ambiente (circa 20°C).",
+      "Stagliare e lasciar riposare in appretto per altre 4 ore a temperatura ambiente.",
+      "Mettere in frigorifero a 4°C per circa 42-47 ore.",
+      "Tirare fuori dal frigo e infornare."
+    ],
+    phases: [
+      { label: "Impasto e puntata", hours: 2, note: "20°C" },
+      { label: "Staglio e appretto", hours: 4, note: "20°C, temperatura ambiente" },
+      { label: "Frigo", hours: 47.5, note: "4°C" }
+    ]
+  },
+
+  napoletanaFioreDiretta63: {
+    label: "Napoletana verace 63% idratazione (Claudia Fiore - sfidapizza.it)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto per pizza napoletana verace con impastatrice, idratazione 63%, ricetta di Claudia Fiore (sfidapizza.it). Dosi originali per 3 pizze, panetti da circa 235 g. Nella napoletana verace lo staglio avviene quasi subito dopo l'impastamento (10-15 minuti): la puntata in massa è ridotta al minimo e la lievitazione avviene principalmente in panetti.",
+    groups: {
+      "Ingredienti": {
+        "Farina": 425, "Acqua": 268, "Sale": 13, "Lievito di birra": 0.25
+      }
+    },
+    steps: [
+      "Impastare tutti gli ingredienti in planetaria fino ad ottenere un impasto liscio e omogeneo.",
+      "Dopo 10-15 minuti dalla fine dell'impastamento, stagliare e formare i panetti (circa 235 g ciascuno per 3 pizze): la puntata in massa è ridotta al minimo.",
+      "Scegliere la durata della lievitazione dei panetti in base alla temperatura ambiente: più è alta, più breve sarà il tempo necessario (vedi tabella).",
+      "Stendere e infornare all'orario scelto."
+    ],
+    tempProfiles: [
+      { label: "16°C – 19°C", phases: [
+        { label: "Impasto", hours: 0.25, note: "poi staglio, puntata ridotta al minimo" },
+        { label: "Staglio e lievitazione panetti", hours: 23.75, note: "16-19°C" }
+      ] },
+      { label: "20°C – 22°C", phases: [
+        { label: "Impasto", hours: 0.25, note: "poi staglio, puntata ridotta al minimo" },
+        { label: "Staglio e lievitazione panetti", hours: 19.75, note: "20-22°C" }
+      ] },
+      { label: "23°C – 24°C", phases: [
+        { label: "Impasto", hours: 0.25, note: "poi staglio, puntata ridotta al minimo" },
+        { label: "Staglio e lievitazione panetti", hours: 9.75, note: "23-24°C" }
+      ] },
+      { label: "25°C – 26°C", phases: [
+        { label: "Impasto", hours: 0.25, note: "poi staglio, puntata ridotta al minimo" },
+        { label: "Staglio e lievitazione panetti", hours: 7.75, note: "25-26°C" }
+      ] },
+      { label: "27°C – 28°C", phases: [
+        { label: "Impasto", hours: 0.25, note: "poi staglio, puntata ridotta al minimo" },
+        { label: "Frigo", hours: 2, note: "27-28°C" },
+        { label: "Temperatura ambiente", hours: 7.75, note: "27-28°C, lievitazione finale" }
+      ] }
+    ]
+  },
+
+  petraTondaPiatto: {
+    label: "Pizza tonda al piatto Petra 3 + 5037 (Petra)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto a metodo diretto con lievito di birra, lievitazione lunga (circa 30 ore), dalla scheda tecnica Petra® - Università della Pizza. Miscela di farina Petra® 3 (integrale, ricca di fibra) e Petra® 5037. Temperatura finale dell'impasto ideale: 24-25°C. Resa originale: 7 palline da 220 g circa (peso a crudo), per un totale di 1702 g di impasto.",
+    groups: {
+      "Ingredienti": {
+        "Farina Petra 3": 500, "Farina Petra 5037": 500, "Lievito di birra fresco": 2,
+        "Acqua": 650, "Sale": 20, "Olio EVO": 30
+      }
+    },
+    steps: [
+      "Disporre tutta la farina e 600 g di acqua nell'impastatrice e attivarla in 1° velocità. Impastare sino ad ottenere un impasto grezzo (di struttura simile a una biga), poi fermare l'impastatrice e far riposare la massa per 20-30 minuti, in modo da permettere una ottimale e uniforme idratazione della farina.",
+      "Riprendere ad impastare introducendo il lievito di birra; quando la maglia glutinica si è formata, aggiungere il sale, la restante acqua gradualmente e infine l'olio. Continuare a impastare sino ad ottenere un impasto liscio e omogeneo, usando la 2° velocità in fase finale per raffinare bene l'impasto e consolidare la maglia glutinica.",
+      "Terminato l'impasto, controllarne la temperatura finale, fondamentale per determinare l'innesco e l'andamento della lievitazione: l'ideale è 24-25°C.",
+      "Trasferire l'impasto in un mastello coperto con un telo per lievitazione (o con un coperchio) e lasciarlo puntare a temperatura ambiente di 24-25°C per 30-45 minuti.",
+      "Collocare il mastello in frigo e lasciare maturare l'impasto a 4°C per 24 ore.",
+      "Trascorso il tempo, toglierlo dal frigo, suddividere l'impasto e formare le palline.",
+      "Lasciarle lievitare a temperatura di 24-25°C per altre 4-5 ore.",
+      "Procedere infine alla stesura, farcitura e cottura.",
+      "Cottura: in forno elettrico o a legna, temperatura consigliata 300-320°C, da regolare in base al proprio forno. Essendo Petra 3 una farina ricca di fibra (che lega e trattiene l'acqua), l'impasto cuoce più lentamente rispetto a uno con farina raffinata tipo 0 o 00: evitare temperature troppo elevate o tempi troppo rapidi, cuocendo per qualche secondo in più per una cottura ottimale."
+    ],
+    phases: [
+      { label: "Autolisi", hours: 0.5, note: "farina + 600 g di acqua, riposo per idratazione" },
+      { label: "Impastamento", hours: 0.5, note: "aggiunta lievito, sale, acqua restante, olio" },
+      { label: "Puntata in massa", hours: 0.5, note: "temperatura ambiente, 24-25°C" },
+      { label: "Maturazione in frigo", hours: 24, note: "4°C" },
+      { label: "Lievitazione palline", hours: 4.5, note: "24-25°C, dopo la formatura" }
+    ],
+    cotturaNote: "forno elettrico o a legna, 300-320°C"
+  },
+
+  sansoneDoppioPrefermento: {
+    label: "Doppio prefermento Sansone",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Ricetta personale con doppio prefermento: biga con farina Petra® 5037 e poolish con farina Petra® 3, preparati separatamente e uniti il giorno successivo. Idratazione totale 75% (chiusura con 9 g di sale sciolto in 7 g di acqua). Proporzioni originali secondo gli appunti scritti a mano.",
+    groups: {
+      "Per la biga (Petra 5037)": { "Farina Petra 5037": 150, "Acqua": 65, "Lievito di birra fresco": 1.5 },
+      "Per il poolish (Petra 3)": { "Farina Petra 3": 165, "Acqua": 165, "Lievito di birra fresco": 0.17 },
+      "Per la chiusura": { "Malto diastasico": 2, "Sale": 9, "Acqua (per sciogliere il sale)": 7 }
+    },
+    steps: [
+      "Biga (Petra 5037): impastare 150 g di farina, 65 g di acqua e 1,5 g di lievito di birra fresco (1%). Lasciar fermentare 18 ore a 18-20°C, iniziando alle ore 20:00.",
+      "Poolish (Petra 3): impastare 165 g di farina, 165 g di acqua e 0,17 g di lievito di birra fresco (0,1%). Lasciar fermentare 16 ore a 18-20°C, iniziando alle ore 22:00.",
+      "Il giorno successivo, verso le ore 14:00, unire i due prefermenti.",
+      "Aggiungere 2 g di malto diastasico e chiudere l'impasto con 9 g di sale sciolto in 7 g di acqua (che porta l'idratazione totale al 75%).",
+      "Dopo la chiusura dell'impasto, tenere la massa 1 ora a temperatura ambiente, effettuare lo staglio e poi riporre in frigo a 4°C per 5 ore.",
+      "Togliere dal frigo una decina di minuti prima dell'infornata, lasciando acclimatare il panetto a temperatura ambiente."
+    ],
+    parallelPhases: [
+      { label: "Biga (Petra 5037)", hours: 18, note: "18-20°C" },
+      { label: "Poolish (Petra 3)", hours: 16, note: "18-20°C" }
+    ],
+    chiusuraLabel: "Chiusura impasto (unione prefermenti + malto + sale in acqua)",
+    phases: [
+      { label: "Puntata in massa", hours: 1, note: "temperatura ambiente" },
+      { label: "Frigo (dopo lo staglio)", hours: 5, note: "4°C" },
+      { label: "Acclimatamento", hours: 0.17, note: "temperatura ambiente prima dell'infornata" }
+    ]
+  },
+
+  poolish50DaRe: {
+    label: "Poolish 50% Da Re",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Poolish al 50% con farina Petra HP, maturato 18 ore a 18-22°C, unito a un rinfresco con farina Petra, sale e malto. Puntata in massa 24 ore a 15°C, poi staglio e appretto 4 ore a temperatura ambiente. Cottura in forno F1 a 400°C cielo / 300°C platea. Ricetta condivisa nel gruppo Facebook \"La Confraternita della Pizza\" (Gas Minnie Vicky, 25 apr 2023).",
+    groups: {
+      "Poolish": { "Farina Petra HP": 335, "Acqua": 335, "Lievito di birra": 0.33 },
+      "Rinfresco": { "Farina Petra": 335, "Acqua": 167, "Sale": 16, "Malto": 6 }
+    },
+    steps: [
+      "Poolish: impastate 335 g di farina Petra HP, 335 g di acqua e 0,33 g di lievito di birra. Lasciate fermentare 18 ore a 18-22°C.",
+      "Rinfresco: aggiungete 335 g di farina Petra, 167 g di acqua, 16 g di sale e 6 g di malto.",
+      "Puntata in massa: 24 ore a 15°C.",
+      "Staglio e appretto: 4 ore a temperatura ambiente.",
+      "Cottura: forno F1 a 400°C in cielo e 300°C in platea."
+    ],
+    phases: [
+      { label: "Poolish", hours: 18, note: "18-22°C" },
+      { label: "Rinfresco", hours: 0.5, note: "preparazione del rinfresco" },
+      { label: "Puntata in massa", hours: 24, note: "15°C" },
+      { label: "Staglio e appretto", hours: 4, note: "temperatura ambiente" }
+    ],
+    cotturaNote: "forno F1, 400°C cielo / 300°C platea"
+  },
+
+  bonciTondaRomana: {
+    label: "Tonda romana al mattarello (Bonci)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Pizza romana tonda, sottile e croccante, stesa col mattarello e cotta su pietra refrattaria (non in teglia). Proporzioni originali per circa 2 kg di impasto.",
+    groups: {
+      "Per la biga": { "Farina tipo 1 medio-forte (280 W)": 1000, "Acqua": 450, "Olio EVO": 50, "Lievito di birra": 10 },
+      "Per l'impasto successivo": { "Acqua": 50, "Sale": 25, "Malto (o zucchero)": 4 }
+    },
+    steps: [
+      "Iniziate il giorno prima con la biga, usando acqua e farina fredde di frigorifero.",
+      "Sciogliete il lievito nell'acqua, poi versate il composto sulla farina e create l'impasto.",
+      "Tenete la biga a temperatura ambiente per 2 ore, poi mettetela in frigorifero per 24 ore.",
+      "Il giorno dopo chiudete la biga aggiungendo l'acqua poco alla volta, il sale e il malto.",
+      "Chiudete l'impasto, lasciate riposare 2 ore a temperatura ambiente e fate palline da 150 grammi.",
+      "Infine, stendete ogni pallina con il mattarello."
+    ]
+  }
+};
+
+function fmt(n) {
+  if (n < 10) return n.toFixed(1).replace('.', ',');
+  return Math.round(n).toString();
+}
+
+function fmtPct(n) {
+  return n.toFixed(1).replace('.', ',');
+}
+
+function isFlour(name) {
+  return /farina|semola/i.test(name);
+}
+
+function groupHydrationLabel(groupWeights) {
+  let flour = 0, water = 0;
+  for (const [name, val] of Object.entries(groupWeights)) {
+    if (isFlour(name)) flour += val;
+    if (/acqua|latte/i.test(name)) water += val;
+  }
+  if (flour <= 0 || water <= 0) return '';
+  const pct = (water / flour * 100);
+  return ` <span class="group-hydration">(idratazione ${fmtPct(pct)}%)</span>`;
+}
+
+function isEditableIngredient(name, groupEntries) {
+  const lower = name.toLowerCase();
+  if (/sale/.test(lower)) return true;
+  if (/olio/.test(lower)) return true;
+  if (/lievito/.test(lower)) return true;
+  if (/acqua/.test(lower)) return true;
+  if (isFlour(name)) {
+    const flourCount = Object.keys(groupEntries).filter(isFlour).length;
+    return flourCount > 1; // farina modificabile solo se è presente una miscela
+  }
+  return false;
+}
+
+function totalFlour(result) {
+  let tot = 0;
+  for (const ing of Object.values(result)) {
+    for (const [name, val] of Object.entries(ing)) {
+      if (isFlour(name)) tot += val;
+    }
+  }
+  return tot;
+}
+
+function computeSumScale(recipe, targetTotal) {
+  let baseTotal = 0;
+  for (const g of Object.values(recipe.groups)) {
+    baseTotal += Object.values(g).reduce((a,b)=>a+b,0);
+  }
+  const factor = targetTotal / baseTotal;
+  const out = {};
+  for (const [gName, ing] of Object.entries(recipe.groups)) {
+    out[gName] = {};
+    for (const [name, val] of Object.entries(ing)) {
+      out[gName][name] = val * factor;
+    }
+  }
+  return out;
+}
+
+function baseRecipeTotal(recipe) {
+  // Somma dei pesi originali degli ingredienti (quelli trascritti dalle foto/fonti)
+  if (recipe.mode !== 'sumScale') return 1000;
+  let total = 0;
+  for (const g of Object.values(recipe.groups)) {
+    total += Object.values(g).reduce((a,b)=>a+b,0);
+  }
+  return Math.round(total);
+}
+
+function computeFlourPct(recipe, targetTotal) {
+  // somma di tutte le percentuali (farina inclusa) = fattore totale rispetto alla farina complessiva
+  let pctSum = 0;
+  for (const g of Object.values(recipe.groups)) {
+    pctSum += Object.values(g).reduce((a,b)=>a+b,0);
+  }
+  const totalFlour = targetTotal / (pctSum / 100);
+  const out = {};
+  for (const [gName, ing] of Object.entries(recipe.groups)) {
+    out[gName] = {};
+    for (const [name, pct] of Object.entries(ing)) {
+      out[gName][name] = totalFlour * (pct / 100);
+    }
+  }
+  return out;
+}
+
+// Percentuali originali (rispetto al totale farina) calcolate una sola volta dai pesi di partenza
+function getBasePercents(recipe) {
+  if (recipe._basePercents) return recipe._basePercents;
+  let flourTot = 0;
+  for (const g of Object.values(recipe.groups)) {
+    for (const [name, val] of Object.entries(g)) {
+      if (isFlour(name)) flourTot += val;
+    }
+  }
+  const percents = {};
+  for (const [gName, ing] of Object.entries(recipe.groups)) {
+    percents[gName] = {};
+    for (const [name, val] of Object.entries(ing)) {
+      percents[gName][name] = flourTot > 0 ? (val / flourTot * 100) : 0;
+    }
+  }
+  recipe._basePercents = percents;
+  recipe._baseFlourTotal = flourTot;
+  return percents;
+}
+
+// Persistenza locale (localStorage): mantiene pesi, panetti, percentuali modificate e tempi tra una riapertura e l'altra
+const STORAGE_KEY = 'calcImpastiState_v1';
+
+function loadStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveStorage(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    // localStorage non disponibile (es. modalità privata): si continua senza salvare
+  }
+}
+
+const storedState = loadStorage();
+
+function persist() {
+  const data = {
+    peso: {}, numpanetti: {}, pesopanetto: {}, tempProfile: {},
+    overrides, phaseHours: phaseHoursStore
+  };
+  Object.keys(recipes).forEach(key => {
+    const pesoEl = document.getElementById('peso-' + key);
+    const numEl = document.getElementById('numpanetti-' + key);
+    const ppEl = document.getElementById('pesopanetto-' + key);
+    const tpEl = document.getElementById('tempprofile-' + key);
+    if (pesoEl) data.peso[key] = pesoEl.value;
+    if (numEl) data.numpanetti[key] = numEl.value;
+    if (ppEl) data.pesopanetto[key] = ppEl.value;
+    if (tpEl) data.tempProfile[key] = parseInt(tpEl.value);
+  });
+  saveStorage(data);
+}
+
+// Stato delle percentuali modificate manualmente dall'utente: overrides[key][gName][name] = percentuale
+const overrides = {};
+if (storedState.overrides) Object.assign(overrides, storedState.overrides);
+// Cella attualmente in modifica (una alla volta)
+let editingCell = null;
+
+function isModified(key) {
+  return !!(overrides[key] && Object.keys(overrides[key]).some(g => Object.keys(overrides[key][g]).length > 0));
+}
+
+function setOverride(key, gName, name, pct) {
+  if (!overrides[key]) overrides[key] = {};
+  if (!overrides[key][gName]) overrides[key][gName] = {};
+  overrides[key][gName][name] = pct;
+}
+
+function resetOverrides(key) {
+  overrides[key] = {};
+}
+
+// Stato delle ore modificate per ogni fase (calcolo a ritroso): phaseHoursStore[storeKey] = [ore fase1, ore fase2, ...]
+const phaseHoursStore = {};
+if (storedState.phaseHours) Object.assign(phaseHoursStore, storedState.phaseHours);
+
+function getPhaseHours(storeKey, phasesArr) {
+  if (!phaseHoursStore[storeKey]) phaseHoursStore[storeKey] = phasesArr.map(p => p.hours);
+  return phaseHoursStore[storeKey];
+}
+
+function resetPhaseHours(storeKey, phasesArr) {
+  phaseHoursStore[storeKey] = phasesArr.map(p => p.hours);
+}
+
+function fmtDT(d) {
+  const days = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+  const dayStr = days[d.getDay()];
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${dayStr} ${dd}/${mm} ${hh}:${mi}`;
+}
+
+function phaseItemHtml(r, storeKey, hoursVal) {
+  return `
+    <div class="phase-item">
+      <div class="phase-times">${fmtDT(r.start)} <span class="phase-arrow">→</span> ${fmtDT(r.end)}</div>
+      <div class="phase-label">${r.phase.label}${r.phase.note ? ` <span class="phase-note">(${r.phase.note})</span>` : ''}</div>
+      <div class="phase-hours-edit">
+        <input type="number" step="0.5" min="0" class="hours-input" data-store="${storeKey}" data-idx="${r.idx}" value="${hoursVal}"> h
+      </div>
+    </div>`;
+}
+
+// Per le ricette con tempProfiles, risolve quale array di fasi e quale storeKey usare
+// in base al profilo di temperatura attualmente selezionato nel menu a tendina.
+function getActivePhases(key) {
+  const recipe = recipes[key];
+  if (recipe.tempProfiles) {
+    const selectEl = document.getElementById('tempprofile-' + key);
+    if (!selectEl) return null;
+    const idx = parseInt(selectEl.value);
+    const profile = recipe.tempProfiles[idx];
+    if (!profile) return null;
+    return { phasesArr: profile.phases, storeKey: key + '::profile' + idx };
+  }
+  if (recipe.phases) return { phasesArr: recipe.phases, storeKey: key };
+  return null;
+}
+
+function renderBackward(key) {
+  const recipe = recipes[key];
+  const active = getActivePhases(key);
+  if (!active) return;
+  const { phasesArr, storeKey } = active;
+  const hours = getPhaseHours(storeKey, phasesArr);
+  const cotturaInput = document.getElementById('cottura-' + key);
+  const container = document.getElementById('phases-' + key);
+  if (!cotturaInput || !container) return;
+  const val = cotturaInput.value;
+
+  if (!val) {
+    container.innerHTML = `<p class="backward-hint">Inserisci sopra l'orario in cui vuoi infornare: l'app calcola a ritroso l'orario di inizio di ogni fase.</p>`;
+    persist();
+    return;
+  }
+
+  const cotturaDate = new Date(val);
+
+  // catena sequenziale (dalla cottura a ritroso)
+  let endTime = cotturaDate;
+  const results = [];
+  for (let i = phasesArr.length - 1; i >= 0; i--) {
+    const startTime = new Date(endTime.getTime() - hours[i] * 3600000);
+    results.unshift({ phase: phasesArr[i], idx: i, start: startTime, end: endTime });
+    endTime = startTime;
+  }
+  const chainAnchor = endTime; // inizio della catena sequenziale = momento della chiusura/convergenza
+
+  let parallelHtml = '';
+  if (recipe.parallelPhases) {
+    const pHours = getPhaseHours(key + '::parallel', recipe.parallelPhases);
+    const pResults = recipe.parallelPhases.map((p, idx) => ({
+      phase: p, idx,
+      start: new Date(chainAnchor.getTime() - pHours[idx] * 3600000),
+      end: chainAnchor
+    }));
+    parallelHtml = pResults.map(r => phaseItemHtml(r, key + '::parallel', pHours[r.idx])).join('') + `
+      <div class="phase-item chiusura-marker">
+        <div class="phase-times">${fmtDT(chainAnchor)}</div>
+        <div class="phase-label">${recipe.chiusuraLabel || 'Convergenza fasi'}</div>
+      </div>`;
+  }
+
+  const chainHtml = results.map(r => phaseItemHtml(r, storeKey, hours[r.idx])).join('');
+
+  container.innerHTML = parallelHtml + chainHtml + `
+    <div class="phase-item final">
+      <div class="phase-times">${fmtDT(cotturaDate)}</div>
+      <div class="phase-label">Cottura${recipe.cotturaNote ? ` <span class="phase-note">(${recipe.cotturaNote})</span>` : ''}</div>
+    </div>
+  `;
+
+  container.querySelectorAll('.hours-input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const store = inp.dataset.store;
+      const idx = parseInt(inp.dataset.idx);
+      const newVal = parseFloat(inp.value);
+      if (!isNaN(newVal) && newVal >= 0) {
+        phaseHoursStore[store][idx] = newVal;
+      }
+      renderBackward(key);
+    });
+  });
+
+  persist();
+}
+
+const categoryLabels = {
+  diretti: "Impasti diretti",
+  indiretti: "Impasti indiretti (con prefermento)"
+};
+const categoryOrder = ["diretti", "indiretti"];
+
+function buildUI() {
+  const tabsWrap = document.getElementById('tabsWrap');
+  const panelsEl = document.getElementById('panels');
+  const keys = Object.keys(recipes);
+  const defaultKey = keys[0];
+
+  categoryOrder.forEach(cat => {
+    const catKeys = keys.filter(k => recipes[k].category === cat);
+    if (catKeys.length === 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'category-block';
+    const title = document.createElement('div');
+    title.className = 'category-title';
+    title.textContent = categoryLabels[cat] || cat;
+    block.appendChild(title);
+
+    const tabsRow = document.createElement('div');
+    tabsRow.className = 'tabs';
+    block.appendChild(tabsRow);
+    tabsWrap.appendChild(block);
+
+    catKeys.forEach(key => {
+      const r = recipes[key];
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn' + (key === defaultKey ? ' active' : '');
+      btn.textContent = r.label;
+      btn.onclick = () => switchTab(key);
+      btn.id = 'tabbtn-' + key;
+      tabsRow.appendChild(btn);
+    });
+  });
+
+  keys.forEach((key, i) => {
+    const r = recipes[key];
+
+    // panel
+    const panel = document.createElement('div');
+    panel.className = 'recipe-panel' + (key === defaultKey ? ' active' : '');
+    panel.id = 'panel-' + key;
+
+    const savedPeso = storedState.peso && storedState.peso[key];
+    const savedNumPanetti = storedState.numpanetti && storedState.numpanetti[key];
+    const savedPesoPanetto = storedState.pesopanetto && storedState.pesopanetto[key];
+
+    panel.innerHTML = `
+      <div class="recipe-desc"><span class="recipe-desc-title">${r.label}</span>${r.desc}</div>
+      <div class="input-card panetti-row">
+        <label for="numpanetti-${key}">Numero panetti</label>
+        <input type="number" id="numpanetti-${key}" value="${savedNumPanetti || Math.max(1, Math.round(baseRecipeTotal(r) / 250))}" min="1" step="1">
+        <label for="pesopanetto-${key}">Peso a panetto</label>
+        <input type="number" id="pesopanetto-${key}" value="${savedPesoPanetto || 250}" min="1" step="5">
+        <span class="unit">grammi</span>
+      </div>
+      <div class="input-card">
+        <label for="peso-${key}">Peso impasto finale</label>
+        <input type="number" id="peso-${key}" value="${savedPeso || baseRecipeTotal(r)}" min="1" step="10">
+        <span class="unit">grammi</span>
+        <button type="button" class="reset-btn" id="reset-${key}">Ripristina</button>
+        <span class="hydration-badge" id="hydration-${key}"></span>
+      </div>
+      <div class="modified-alert" id="alert-${key}" style="display:none;">
+        ⚠️ Alcune percentuali sono state modificate rispetto alla ricetta originale.
+        <button type="button" class="reset-pct-btn" id="reset-pct-${key}">Ripristina percentuali originali</button>
+      </div>
+      <div class="cols" id="cols-${key}"></div>
+      <div class="total-row" id="total-${key}"></div>
+      ${(r.phases || r.tempProfiles) ? `
+      <div class="backward-box">
+        <h2>Pianifica la cottura (calcolo a ritroso)</h2>
+        <div class="backward-input-row">
+          ${r.tempProfiles ? `
+          <label for="tempprofile-${key}">Temperatura ambiente</label>
+          <select id="tempprofile-${key}">
+            ${r.tempProfiles.map((p, i) => `<option value="${i}"${i === (storedState.tempProfile && storedState.tempProfile[key] !== undefined ? storedState.tempProfile[key] : 0) ? ' selected' : ''}>${p.label}</option>`).join('')}
+          </select>` : ''}
+          <label for="cottura-${key}">Quando vuoi infornare?</label>
+          <input type="datetime-local" id="cottura-${key}">
+          <button type="button" class="reset-btn" id="reset-phases-${key}">Ripristina tempi</button>
+        </div>
+        <div id="phases-${key}"></div>
+      </div>` : ''}
+      ${r.timeline ? `
+      <div class="timeline-box">
+        <h2>Timeline</h2>
+        <div class="timeline">
+          ${r.timeline.map(t => `
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-daytime">${t.day} – ore ${t.time}</div>
+              <div class="timeline-label">${t.label}</div>
+              <div class="timeline-duration">${t.duration}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+      ${r.steps ? `
+      <div class="steps">
+        <h2>Procedimento</h2>
+        <ol>${r.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>` : ''}
+    `;
+    panelsEl.appendChild(panel);
+
+    document.getElementById('peso-' + key).addEventListener('input', () => {
+      const peso = parseFloat(document.getElementById('peso-' + key).value) || 0;
+      const numPanetti = parseFloat(document.getElementById('numpanetti-' + key).value) || 0;
+      if (numPanetti > 0) {
+        document.getElementById('pesopanetto-' + key).value = Math.round(peso / numPanetti);
+      }
+      render(key);
+    });
+    const syncFromPanetti = () => {
+      const numPanetti = parseFloat(document.getElementById('numpanetti-' + key).value) || 0;
+      const pesoPanetto = parseFloat(document.getElementById('pesopanetto-' + key).value) || 0;
+      document.getElementById('peso-' + key).value = Math.round(numPanetti * pesoPanetto);
+      render(key);
+    };
+    document.getElementById('numpanetti-' + key).addEventListener('input', syncFromPanetti);
+    document.getElementById('pesopanetto-' + key).addEventListener('input', syncFromPanetti);
+    document.getElementById('reset-' + key).addEventListener('click', () => {
+      document.getElementById('peso-' + key).value = baseRecipeTotal(r);
+      const defaultNum = Math.max(1, Math.round(baseRecipeTotal(r) / 250));
+      document.getElementById('numpanetti-' + key).value = defaultNum;
+      document.getElementById('pesopanetto-' + key).value = 250;
+      render(key);
+    });
+    document.getElementById('reset-pct-' + key).addEventListener('click', () => {
+      resetOverrides(key);
+      editingCell = null;
+      render(key);
+    });
+
+    if (r.phases || r.tempProfiles) {
+      document.getElementById('cottura-' + key).addEventListener('input', () => renderBackward(key));
+      if (r.tempProfiles) {
+        document.getElementById('tempprofile-' + key).addEventListener('change', () => renderBackward(key));
+      }
+      document.getElementById('reset-phases-' + key).addEventListener('click', () => {
+        const active = getActivePhases(key);
+        if (active) resetPhaseHours(active.storeKey, active.phasesArr);
+        if (r.parallelPhases) resetPhaseHours(key + '::parallel', r.parallelPhases);
+        renderBackward(key);
+      });
+    }
+  });
+
+  document.getElementById('globalNote').textContent =
+    "Tutte le ricette sono trascritte fedelmente dalle fonti originali (libri di Bonci, Casucci, schede tecniche Petra...) e scalate proporzionalmente sul peso totale che inserisci. La fonte è indicata tra parentesi in ogni scheda. Accanto al peso impasto trovi anche l'idratazione totale (acqua/farina, comprensiva di quella nel prefermento). Accanto a ogni peso è indicata la percentuale panificatoria (rispetto al totale farina = 100%): per sale, olio, lievito, acqua e farina (quando è una miscela di più tipi) puoi modificarla con la matita, mantenendo fisso il totale di farina.";
+
+  keys.forEach(render);
+  keys.forEach(key => { if (recipes[key].phases || recipes[key].tempProfiles) renderBackward(key); });
+}
+
+function switchTab(key) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.recipe-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tabbtn-' + key).classList.add('active');
+  document.getElementById('panel-' + key).classList.add('active');
+}
+
+function render(key) {
+  const recipe = recipes[key];
+  const target = parseFloat(document.getElementById('peso-' + key).value) || 0;
+  const basePercents = getBasePercents(recipe);
+  const scaleFactor = recipe._baseFlourTotal > 0 ? (target / baseRecipeTotal(recipe)) : 1;
+  const flourTotalScaled = recipe._baseFlourTotal * scaleFactor;
+
+  // percentuali effettive (override se presenti, altrimenti quelle originali)
+  const effPercents = {};
+  for (const [gName, ing] of Object.entries(recipe.groups)) {
+    effPercents[gName] = {};
+    for (const name of Object.keys(ing)) {
+      const ov = overrides[key] && overrides[key][gName] && overrides[key][gName][name];
+      effPercents[gName][name] = (ov !== undefined) ? ov : basePercents[gName][name];
+    }
+  }
+
+  // per le miscele di farina: rinormalizza così che il totale farina resti quello originale
+  for (const [gName, ing] of Object.entries(recipe.groups)) {
+    const flourNames = Object.keys(ing).filter(isFlour);
+    if (flourNames.length > 1) {
+      const baseSum = flourNames.reduce((s, n) => s + basePercents[gName][n], 0);
+      const rawSum = flourNames.reduce((s, n) => s + effPercents[gName][n], 0);
+      if (rawSum > 0) {
+        flourNames.forEach(n => {
+          effPercents[gName][n] = effPercents[gName][n] * (baseSum / rawSum);
+        });
+      }
+    }
+  }
+
+  // pesi finali: farina secondo lo scaling standard, tutti gli altri secondo %*flourTotale
+  const result = {};
+  let actualTotal = 0;
+  for (const [gName, ing] of Object.entries(recipe.groups)) {
+    result[gName] = {};
+    for (const name of Object.keys(ing)) {
+      const w = flourTotalScaled * (effPercents[gName][name] / 100);
+      result[gName][name] = w;
+      actualTotal += w;
+    }
+  }
+
+  const colsEl = document.getElementById('cols-' + key);
+  colsEl.innerHTML = '';
+  const groupNames = Object.keys(result);
+  groupNames.forEach((gName, idx) => {
+    const div = document.createElement('div');
+    div.className = 'group' + (groupNames.length % 2 !== 0 && idx === groupNames.length - 1 ? ' full' : '');
+    const ul = document.createElement('ul');
+    for (const [name, val] of Object.entries(result[gName])) {
+      const li = document.createElement('li');
+      const editable = isEditableIngredient(name, recipe.groups[gName]);
+      const modified = overrides[key] && overrides[key][gName] && overrides[key][gName][name] !== undefined;
+      const pct = effPercents[gName][name];
+
+      if (editingCell && editingCell.key === key && editingCell.gName === gName && editingCell.name === name) {
+        li.innerHTML = `
+          <span>${name}</span>
+          <span class="val editing">
+            <input type="number" step="0.1" class="pct-input" id="pctinput-${key}-${gName}-${name}" value="${pct.toFixed(1)}">%
+            <button type="button" class="pct-save" id="pctsave-${key}-${gName}-${name}">✓</button>
+          </span>`;
+        ul.appendChild(li);
+        continue;
+      }
+
+      li.innerHTML = `<span>${name}</span><span class="val${modified ? ' modified' : ''}">${fmt(val)} g <span class="pct">(${fmtPct(pct)}%)</span>${editable ? `<button type="button" class="edit-pct-btn" data-g="${gName}" data-n="${name}" title="Modifica percentuale">✎</button>` : ''}</span>`;
+      ul.appendChild(li);
+    }
+    div.innerHTML = `<h2>${gName}${groupHydrationLabel(result[gName])}</h2>`;
+    div.appendChild(ul);
+    colsEl.appendChild(div);
+  });
+
+  // collega i pulsanti matita
+  colsEl.querySelectorAll('.edit-pct-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      editingCell = { key, gName: btn.dataset.g, name: btn.dataset.n };
+      render(key);
+      const input = document.getElementById(`pctinput-${key}-${btn.dataset.g}-${btn.dataset.n}`);
+      if (input) { input.focus(); input.select(); }
+    });
+  });
+  // collega salvataggio inline
+  if (editingCell && editingCell.key === key) {
+    const { gName, name } = editingCell;
+    const input = document.getElementById(`pctinput-${key}-${gName}-${name}`);
+    const saveBtn = document.getElementById(`pctsave-${key}-${gName}-${name}`);
+    const commit = () => {
+      const newVal = parseFloat(input.value);
+      if (!isNaN(newVal) && newVal >= 0) {
+        setOverride(key, gName, name, newVal);
+      }
+      editingCell = null;
+      render(key);
+    };
+    if (saveBtn) saveBtn.addEventListener('click', commit);
+    if (input) {
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') commit(); });
+      input.addEventListener('blur', commit);
+    }
+  }
+
+  const alertEl = document.getElementById('alert-' + key);
+  alertEl.style.display = isModified(key) ? 'flex' : 'none';
+
+  // idratazione totale = somma delle percentuali di tutti gli ingredienti "acqua" (già rispetto al totale farina)
+  let totalHydration = 0;
+  for (const ing of Object.values(effPercents)) {
+    for (const [name, pct] of Object.entries(ing)) {
+      if (/acqua|latte/i.test(name)) totalHydration += pct;
+    }
+  }
+  document.getElementById('hydration-' + key).textContent = `Idratazione totale: ${fmtPct(totalHydration)}%`;
+
+  document.getElementById('total-' + key).textContent =
+    isModified(key)
+      ? `Totale impasto: ${fmt(actualTotal)} g (peso di riferimento inserito: ${fmt(target)} g)`
+      : `Totale impasto: ${fmt(target)} g`;
+
+  persist();
+}
+
+buildUI();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {
+      // se la registrazione fallisce (es. pagina aperta da file:// invece che da un server), si continua senza PWA offline
+    });
+  });
+}
+</script>
+</body>
+</html>
