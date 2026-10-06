@@ -899,6 +899,36 @@ const recipes = {
       "Chiudete l'impasto, lasciate riposare 2 ore a temperatura ambiente e fate palline da 150 grammi.",
       "Infine, stendete ogni pallina con il mattarello."
     ]
+  },
+
+  bigaFastPriore: {
+    label: "Biga Fast (Ettore Priore - Confraternita della Pizza)",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Impasto indiretto a biga veloce ideato da Ettore Priore (Confraternita della Pizza), idratazione totale 75% circa. Dosi originali per 3 panetti da 230 g (690 g di impasto).",
+    groups: {
+      "Per la biga": { "Farina": 379.5, "Acqua": 191.6, "Lievito di birra": 3.8 },
+      "Per l'impasto principale": { "Acqua": 95.82, "Sale": 11.5 }
+    },
+    steps: [
+      "Impastare la biga con farina, acqua e lievito di birra, poi metterla in un contenitore chiuso a 28°C.",
+      "Lasciare riposare la biga in massa a 28°C per circa 3 ore.",
+      "Avviare la spirale con la biga e metà dell'acqua rimanente, incordare a ferro, poi immettere a filo l'acqua restante mantenendo sempre la corda. Aggiungere il sale.",
+      "Rovesciare l'impasto sul banco e stagliare.",
+      "Eseguire tre pieghe di rinforzo (pieghe Bonci), a distanza di circa 10 minuti l'una dall'altra.",
+      "Mettere l'impasto nei contenitori a 26°C.",
+      "Lasciare lievitare per circa 1 ora e mezza, poi infornare."
+    ],
+    phases: [
+      { label: "Impasto biga", hours: 0.083, note: "poi in contenitore chiuso a 28°C" },
+      { label: "Biga in massa", hours: 2.917, note: "28°C" },
+      { label: "Chiusura impasto e staglio", hours: 0.5, note: "incordatura con biga e acqua, poi sale; impasto sul banco e staglio" },
+      { label: "Prima piega", hours: 0.05, note: "piega Bonci" },
+      { label: "Seconda piega", hours: 0.183, note: "piega Bonci" },
+      { label: "Terza piega", hours: 0.183, note: "piega Bonci" },
+      { label: "Puntata in contenitore", hours: 0.083, note: "26°C" },
+      { label: "Appretto finale", hours: 1.5, note: "26°C, fino alla cottura" }
+    ]
   }
 };
 
