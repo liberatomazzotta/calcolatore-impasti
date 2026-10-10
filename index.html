@@ -882,6 +882,37 @@ const recipes = {
     cotturaNote: "forno F1, 400°C cielo / 300°C platea"
   },
 
+  bigaPoolish80DaRe: {
+    label: "Biga + Poolish 80% Da Re",
+    category: "indiretti",
+    mode: "sumScale",
+    desc: "Doppio prefermento (biga + poolish) con farina Petra 5020, idratazione finale 80%. Biga e poolish maturano 18 ore a 18°C e vengono poi uniti in planetaria con acqua, malto e sale; nessuna piega, 1 ora in contenitore oliato e 3 ore di staglio e appretto, sempre a 18°C. Cottura in forno F1 a 380°C cielo / 320°C platea per due minuti. Ricetta di Silvia Da Re condivisa nel gruppo Facebook \"La Confraternita della Pizza\" (Gas Minnie Vicky, 20 set 2022).",
+    groups: {
+      "Biga": { "Farina Petra 5020": 350, "Acqua": 193, "Lievito di birra": 3.5 },
+      "Poolish": { "Farina Petra 5020": 300, "Acqua": 300, "Lievito di birra": 0.3 },
+      "Rinfresco": { "Acqua": 27, "Sale": 16, "Malto": 6 }
+    },
+    steps: [
+      "Biga: impastate 350 g di farina Petra 5020, 193 g di acqua e 3,5 g di lievito di birra. Lasciate maturare 18 ore a 18°C.",
+      "Poolish: mescolate 300 g di farina Petra 5020, 300 g di acqua e 0,3 g di lievito di birra. Lasciate maturare 18 ore a 18°C.",
+      "Rinfresco: mettete in planetaria la biga spezzettata, il poolish, 6 g di malto e metà dei 27 g di acqua; lavorate a bassa velocità fino a incordatura.",
+      "Aggiungete 16 g di sale e la restante acqua (circa 20 g) a filo.",
+      "Nessuna piega: tenete l'impasto 1 ora in un contenitore oliato a 18°C.",
+      "Staglio e appretto: circa 3 ore, sempre a 18°C.",
+      "Cottura: forno F1 a 380°C in cielo e 320°C in platea per due minuti."
+    ],
+    parallelPhases: [
+      { label: "Biga", hours: 18, note: "18°C" },
+      { label: "Poolish", hours: 18, note: "18°C" }
+    ],
+    chiusuraLabel: "Rinfresco (unione biga + poolish + malto, poi sale)",
+    phases: [
+      { label: "Contenitore oliato", hours: 1, note: "18°C, nessuna piega" },
+      { label: "Staglio e appretto", hours: 3, note: "18°C" }
+    ],
+    cotturaNote: "forno F1, 380°C cielo / 320°C platea, 2 minuti"
+  },
+
   bonciTondaRomana: {
     label: "Tonda romana al mattarello (Bonci)",
     category: "indiretti",
