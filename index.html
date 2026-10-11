@@ -1099,7 +1099,7 @@ const storedState = loadStorage();
 function persist() {
   const data = {
     peso: {}, numpanetti: {}, pesopanetto: {}, tempProfile: {},
-    overrides, phaseHours: phaseHoursStore
+    overrides, phaseEdits: collectPhaseEdits()
   };
   Object.keys(recipes).forEach(key => {
     const pesoEl = document.getElementById('peso-' + key);
@@ -1136,10 +1136,36 @@ function resetOverrides(key) {
 
 // Stato delle ore modificate per ogni fase (calcolo a ritroso): phaseHoursStore[storeKey] = [ore fase1, ore fase2, ...]
 const phaseHoursStore = {};
-if (storedState.phaseHours) Object.assign(phaseHoursStore, storedState.phaseHours);
+// Valori predefiniti di ogni fase (dalla ricetta): servono per salvare solo le ore modificate dall'utente
+const phaseDefaults = {};
+
+// Salva solo le ore diverse da quelle della ricetta, così un aggiornamento della ricetta non viene mai oscurato da valori vecchi
+function collectPhaseEdits() {
+  const edits = {};
+  for (const [storeKey, arr] of Object.entries(phaseHoursStore)) {
+    const def = phaseDefaults[storeKey] || [];
+    arr.forEach((v, i) => {
+      if (v !== def[i]) {
+        if (!edits[storeKey]) edits[storeKey] = {};
+        edits[storeKey][i] = v;
+      }
+    });
+  }
+  return edits;
+}
 
 function getPhaseHours(storeKey, phasesArr) {
-  if (!phaseHoursStore[storeKey]) phaseHoursStore[storeKey] = phasesArr.map(p => p.hours);
+  if (!phaseHoursStore[storeKey]) {
+    phaseDefaults[storeKey] = phasesArr.map(p => p.hours);
+    const arr = phaseDefaults[storeKey].slice();
+    const saved = storedState.phaseEdits && storedState.phaseEdits[storeKey];
+    if (saved) {
+      for (const [i, v] of Object.entries(saved)) {
+        if (i < arr.length && typeof v === 'number' && v >= 0) arr[i] = v;
+      }
+    }
+    phaseHoursStore[storeKey] = arr;
+  }
   return phaseHoursStore[storeKey];
 }
 
