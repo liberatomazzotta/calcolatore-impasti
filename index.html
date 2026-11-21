@@ -785,10 +785,10 @@ const recipes = {
     label: "Pizza Da Michele - replica (Sergio Mura)",
     category: "diretti",
     mode: "sumScale",
-    desc: "Impasto diretto che replica la famosa pizza della pizzeria Da Michele (Condurro), ricetta di Sergio Mura. Farina Caputo Pizzeria, acqua fredda di frigo, pochissimo lievito di birra fresco e 24 ore di lievitazione a 20°C. Dosi originali per 4 panielli da 250 g.",
+    desc: "Impasto diretto che replica la famosa pizza della pizzeria Da Michele (Condurro), ricetta di Sergio Mura. Farina Caputo Pizzeria, acqua fredda di frigo, pochissimo lievito di birra fresco e 24 ore di lievitazione a 20°C. Dosi originali per 4 panielli da 250 g. Scegli la temperatura ambiente: oltre alla ricetta originale (20°C, 0,2 g di lievito) trovi le dosi di lievito per 24 ore di lievitazione secondo la tabella dei grammi di lievito per kg di farina.",
     groups: {
       "Ingredienti": {
-        "Farina Caputo Pizzeria": 600, "Acqua": 385, "Sale": 17, "Lievito di birra": 0.2
+        "Farina Caputo Pizzeria": 600, "Acqua": 385, "Sale": 17, "Lievito di birra fresco": 0.2
       }
     },
     steps: [
@@ -799,11 +799,64 @@ const recipes = {
       "Stendere la pizza senza cornicione, o con un cornicione appena accennato.",
       "Infornare a 450-500°C per 60-90 secondi."
     ],
-    phases: [
-      { label: "Lievitazione in massa", hours: 24, note: "20°C" },
-      { label: "Panielli", hours: 6, note: "20°C, almeno 6 ore" }
+    tempProfiles: [
+      { label: "Ricetta originale (Mura): 20°C, lievito 0,2 g su 600 g", phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "20°C" },
+        { label: "Panielli", hours: 6, note: "20°C, almeno 6 ore" }
+      ] },
+      { label: "16°C: lievito 1,0 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra fresco": 1.0 }, phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "16°C" },
+        { label: "Panielli", hours: 6, note: "16°C, almeno 6 ore" }
+      ] },
+      { label: "18°C: lievito 0,8 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra fresco": 0.8 }, phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "18°C" },
+        { label: "Panielli", hours: 6, note: "18°C, almeno 6 ore" }
+      ] },
+      { label: "20°C: lievito 0,6 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra fresco": 0.6 }, phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "20°C" },
+        { label: "Panielli", hours: 6, note: "20°C, almeno 6 ore" }
+      ] },
+      { label: "22°C: lievito 0,5 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra fresco": 0.5 }, phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "22°C" },
+        { label: "Panielli", hours: 6, note: "22°C, almeno 6 ore" }
+      ] },
+      { label: "24°C: lievito 0,4 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra fresco": 0.4 }, phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "24°C" },
+        { label: "Panielli", hours: 6, note: "24°C, almeno 6 ore" }
+      ] },
+      { label: "26°C: lievito 0,3 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra fresco": 0.3 }, phases: [
+        { label: "Lievitazione in massa", hours: 24, note: "26°C" },
+        { label: "Panielli", hours: 6, note: "26°C, almeno 6 ore" }
+      ] }
     ],
     cotturaNote: "forno a 450-500°C, 60-90 secondi"
+  },
+
+  pizzaDaMicheleLiguori: {
+    label: "Pizza Da Michele - processo della pizzeria (Scatti di Gusto)",
+    category: "diretti",
+    mode: "sumScale",
+    desc: "Impasto diretto che descrive la lavorazione della pizza Da Michele (Napoli), da un video di Italia Squisita con Emanuele Liguori, riportata da Scatti di Gusto: non è una ricetta pubblicata dalla pizzeria. Dosi riferite a 1 kg di farina 00 (il locale usa la Caputo Blu pizzeria), con un rinforzo d'acqua di circa 120 g che porta l'idratazione oltre il 60%. Il lievito non è specificato nell'articolo. Maturazione in massa di circa 24 ore a temperatura ambiente (a casa circa 12 ore). Palline da 300-320 g.",
+    groups: {
+      "Ingredienti": {
+        "Farina 00 (Caputo Blu pizzeria)": 1000, "Acqua": 500, "Acqua di rinforzo": 120, "Sale": 30, "Lievito di birra": 5
+      }
+    },
+    steps: [
+      "Mettere per prima l'acqua nell'impastatrice e aggiungere subito lievito e sale. Impastare per circa 40 minuti, fino al \"punto di pasta\" (si riconosce a occhio e al tatto), con il rinforzo d'acqua di circa 120 g.",
+      "Lasciar maturare l'impasto in massa per circa 24 ore a temperatura ambiente, coperto con una tavola di compensato.",
+      "Stagliare palline da 300-320 g, pesate a mano e arrotolate con movimento circolare.",
+      "Lasciar riposare le palline per 4-5 ore nelle tavole, accanto al banco di stesura.",
+      "Stendere a schiaffo dall'esterno verso il centro, ottenendo un disco di oltre 33 cm con cornicione molto sottile e bordi leggermente più alti.",
+      "Condire. Margherita: pomodoro campano, fiordilatte di Agerola a julienne, pecorino romano, olio. Marinara: pomodoro, aglio tagliato a mano, origano, olio di semi (miscela di arachidi, soia e girasole).",
+      "Infornare nel forno a legna a circa 500°C per circa 40 secondi (sotto i 60)."
+    ],
+    phases: [
+      { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+      { label: "Maturazione in massa", hours: 24, note: "temperatura ambiente, coperto con tavola di compensato" },
+      { label: "Panielli", hours: 4.5, note: "riposo di 4-5 ore nelle tavole dopo lo staglio" }
+    ],
+    cotturaNote: "forno a legna, circa 500°C, circa 40 secondi"
   },
 
   napoletanaFioreDiretta63: {
@@ -1016,11 +1069,13 @@ const recipes = {
 };
 
 function fmt(n) {
+  if (n < 1) return n.toFixed(2).replace('.', ',');
   if (n < 10) return n.toFixed(1).replace('.', ',');
   return Math.round(n).toString();
 }
 
 function fmtPct(n) {
+  if (n < 1) return n.toFixed(2).replace('.', ',');
   return n.toFixed(1).replace('.', ',');
 }
 
@@ -1473,7 +1528,7 @@ function buildUI() {
     if (r.phases || r.tempProfiles) {
       document.getElementById('cottura-' + key).addEventListener('input', () => renderBackward(key));
       if (r.tempProfiles) {
-        document.getElementById('tempprofile-' + key).addEventListener('change', () => renderBackward(key));
+        document.getElementById('tempprofile-' + key).addEventListener('change', () => { render(key); renderBackward(key); });
       }
       document.getElementById('reset-phases-' + key).addEventListener('click', () => {
         const active = getActivePhases(key);
@@ -1505,13 +1560,18 @@ function render(key) {
   const scaleFactor = recipe._baseFlourTotal > 0 ? (target / baseRecipeTotal(recipe)) : 1;
   const flourTotalScaled = recipe._baseFlourTotal * scaleFactor;
 
+  // profilo di temperatura selezionato (può impostare dosi diverse, es. del lievito, in g per kg di farina)
+  const tpSel = recipe.tempProfiles && document.getElementById('tempprofile-' + key);
+  const activeProfile = tpSel ? recipe.tempProfiles[parseInt(tpSel.value)] : null;
+
   // percentuali effettive (override se presenti, altrimenti quelle originali)
   const effPercents = {};
   for (const [gName, ing] of Object.entries(recipe.groups)) {
     effPercents[gName] = {};
     for (const name of Object.keys(ing)) {
       const ov = overrides[key] && overrides[key][gName] && overrides[key][gName][name];
-      effPercents[gName][name] = (ov !== undefined) ? ov : basePercents[gName][name];
+      const profPerKg = activeProfile && activeProfile.ingredientPerKg && activeProfile.ingredientPerKg[name];
+      effPercents[gName][name] = (ov !== undefined) ? ov : (typeof profPerKg === 'number' ? profPerKg / 10 : basePercents[gName][name]);
     }
   }
 
