@@ -1606,7 +1606,7 @@ function render(key) {
         continue;
       }
 
-      li.innerHTML = `<span>${name}</span><span class="val${modified ? ' modified' : ''}">${fmt(val)} g <span class="pct">(${fmtPct(pct)}%)</span>${editable ? `<button type="button" class="edit-pct-btn" data-g="${gName}" data-n="${name}" title="Modifica percentuale">✎</button>` : ''}</span>`;
+      li.innerHTML = `<span>${name}</span><span class="val${modified ? ' modified' : ''}">${/lievito/i.test(name) ? val.toFixed(2).replace('.', ',') : fmt(val)} g <span class="pct">(${fmtPct(pct)}%)</span>${editable ? `<button type="button" class="edit-pct-btn" data-g="${gName}" data-n="${name}" title="Modifica percentuale">✎</button>` : ''}</span>`;
       ul.appendChild(li);
     }
     div.innerHTML = `<h2>${gName}${groupHydrationLabel(result[gName])}</h2>`;
