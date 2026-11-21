@@ -785,10 +785,10 @@ const recipes = {
     label: "Pizza Da Michele - processo della pizzeria (Scatti di Gusto)",
     category: "diretti",
     mode: "sumScale",
-    desc: "Impasto diretto che descrive la lavorazione della pizza Da Michele (Napoli), da un video di Italia Squisita con Emanuele Liguori, riportata da Scatti di Gusto: non è una ricetta pubblicata dalla pizzeria. Dosi riferite a 1 kg di farina 00 (il locale usa la Caputo Blu pizzeria), con un rinforzo d'acqua di circa 120 g che porta l'idratazione oltre il 60%. Il lievito non è specificato nell'articolo. Maturazione in massa di circa 24 ore a temperatura ambiente (a casa circa 12 ore). Palline da 300-320 g.",
+    desc: "Impasto diretto che descrive la lavorazione della pizza Da Michele (Napoli), da un video di Italia Squisita con Emanuele Liguori, riportata da Scatti di Gusto: non è una ricetta pubblicata dalla pizzeria. Dosi riferite a 1 kg di farina 00 (il locale usa la Caputo Blu pizzeria), con un rinforzo d'acqua di circa 120 g che porta l'idratazione oltre il 60%. Il lievito non è specificato nell'articolo: le dosi di lievito di birra fresco (g per kg di farina) sono quelle della tabella per 24 ore di lievitazione, da scegliere in base alla temperatura ambiente (di default 20°C, 0,6 g/kg). Maturazione in massa di circa 24 ore a temperatura ambiente. Palline da 300-320 g.",
     groups: {
       "Ingredienti": {
-        "Farina 00 (Caputo Blu pizzeria)": 1000, "Acqua": 500, "Acqua di rinforzo": 120, "Sale": 30, "Lievito di birra": 5
+        "Farina 00 (Caputo Blu pizzeria)": 1000, "Acqua": 500, "Acqua di rinforzo": 120, "Sale": 30, "Lievito di birra": 0.6
       }
     },
     steps: [
@@ -804,6 +804,38 @@ const recipes = {
       { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
       { label: "Maturazione in massa", hours: 24, note: "temperatura ambiente, coperto con tavola di compensato" },
       { label: "Panielli", hours: 4.5, note: "riposo di 4-5 ore nelle tavole dopo lo staglio" }
+    ],
+    tempProfiles: [
+      { label: "16°C: lievito 1,0 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra": 1.0 }, phases: [
+        { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+        { label: "Maturazione in massa", hours: 24, note: "16°C, coperto con tavola di compensato" },
+        { label: "Panielli", hours: 4.5, note: "16°C, riposo di 4-5 ore nelle tavole dopo lo staglio" }
+      ] },
+      { label: "18°C: lievito 0,8 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra": 0.8 }, phases: [
+        { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+        { label: "Maturazione in massa", hours: 24, note: "18°C, coperto con tavola di compensato" },
+        { label: "Panielli", hours: 4.5, note: "18°C, riposo di 4-5 ore nelle tavole dopo lo staglio" }
+      ] },
+      { label: "20°C: lievito 0,6 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra": 0.6 }, phases: [
+        { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+        { label: "Maturazione in massa", hours: 24, note: "20°C, coperto con tavola di compensato" },
+        { label: "Panielli", hours: 4.5, note: "20°C, riposo di 4-5 ore nelle tavole dopo lo staglio" }
+      ] },
+      { label: "22°C: lievito 0,5 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra": 0.5 }, phases: [
+        { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+        { label: "Maturazione in massa", hours: 24, note: "22°C, coperto con tavola di compensato" },
+        { label: "Panielli", hours: 4.5, note: "22°C, riposo di 4-5 ore nelle tavole dopo lo staglio" }
+      ] },
+      { label: "24°C: lievito 0,4 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra": 0.4 }, phases: [
+        { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+        { label: "Maturazione in massa", hours: 24, note: "24°C, coperto con tavola di compensato" },
+        { label: "Panielli", hours: 4.5, note: "24°C, riposo di 4-5 ore nelle tavole dopo lo staglio" }
+      ] },
+      { label: "26°C: lievito 0,3 g/kg di farina (tabella)", ingredientPerKg: { "Lievito di birra": 0.3 }, phases: [
+        { label: "Impasto", hours: 0.67, note: "circa 40 minuti" },
+        { label: "Maturazione in massa", hours: 24, note: "26°C, coperto con tavola di compensato" },
+        { label: "Panielli", hours: 4.5, note: "26°C, riposo di 4-5 ore nelle tavole dopo lo staglio" }
+      ] }
     ],
     cotturaNote: "forno a legna, circa 500°C, circa 40 secondi"
   },
